@@ -127,13 +127,9 @@ PRODUCT_PACKAGES += \
 
 # Custom MK packages
 PRODUCT_PACKAGES += \
-    Aegis \
-    Eleven \
     ExactCalculator \
     LockClock \
-    MKCenter \
     MKSettingsProvider \
-    MKUpdateVerification \
     MoKeeSetupWizard \
     MoKeeWeatherProvider \
     Venus \
@@ -141,7 +137,7 @@ PRODUCT_PACKAGES += \
     WeatherProvider
 
 # Exchange support
-PRODUCT_PACKAGES += \
+#PRODUCT_PACKAGES += \
     Exchange2
 
 # Extra tools in MK
