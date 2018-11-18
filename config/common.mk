@@ -1,3 +1,6 @@
+# Allow vendor/extra to override any property by setting it first
+$(call inherit-product-if-exists, vendor/extra/product.mk)
+
 PRODUCT_BRAND ?= mokee
 
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
@@ -29,10 +32,10 @@ endif
 ifneq ($(TARGET_BUILD_VARIANT),eng)
   ifdef MK_EXPERIMENTAL
     # Disable ADB authentication
-    PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.adb.secure=0
+    PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure=0
   else
     # Enable ADB authentication
-    PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.adb.secure=1
+    PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure=1
   endif
 endif
 
@@ -51,6 +54,13 @@ PRODUCT_COPY_FILES += \
     vendor/mk/prebuilt/common/bin/50-mk.sh:system/addon.d/50-mk.sh \
     vendor/mk/prebuilt/common/bin/blacklist:system/addon.d/blacklist
 
+ifeq ($(AB_OTA_UPDATER),true)
+PRODUCT_COPY_FILES += \
+    vendor/mk/prebuilt/common/bin/backuptool_ab.sh:system/bin/backuptool_ab.sh \
+    vendor/mk/prebuilt/common/bin/backuptool_ab.functions:system/bin/backuptool_ab.functions \
+    vendor/mk/prebuilt/common/bin/backuptool_postinstall.sh:system/bin/backuptool_postinstall.sh
+endif
+
 # Backup Services whitelist
 PRODUCT_COPY_FILES += \
     vendor/mk/config/permissions/backup.xml:system/etc/sysconfig/backup.xml
@@ -58,10 +68,6 @@ PRODUCT_COPY_FILES += \
 # MK-specific broadcast actions whitelist
 PRODUCT_COPY_FILES += \
     vendor/mk/config/permissions/mokee-sysconfig.xml:system/etc/sysconfig/mokee-sysconfig.xml
-
-# Signature compatibility validation
-PRODUCT_COPY_FILES += \
-    vendor/mk/prebuilt/common/bin/otasigcheck.sh:install/bin/otasigcheck.sh
 
 # init.d support
 PRODUCT_COPY_FILES += \
@@ -114,7 +120,6 @@ PRODUCT_PACKAGES += \
 
 # Required MK packages
 PRODUCT_PACKAGES += \
-    BluetoothExt \
     MKParts \
     Development \
     Profiles
@@ -135,16 +140,13 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     Aegis \
     AudioFX \
-    Eleven \
     ExactCalculator \
-    Jelly \
     LockClock \
     MKCenter \
     MKSettingsProvider \
     MKUpdateVerification \
     MoKeeSetupWizard \
     MoKeeWeatherProvider \
-    Venus \
     WallpaperPicker \
     WeatherProvider
 
@@ -154,6 +156,7 @@ PRODUCT_PACKAGES += \
 
 # Berry styles
 PRODUCT_PACKAGES += \
+    MoKeeBlackTheme \
     MoKeeDarkTheme \
     MoKeeBlackAccent \
     MoKeeBlueAccent \
@@ -173,21 +176,11 @@ PRODUCT_PACKAGES += \
     bash \
     bzip2 \
     curl \
-    fsck.ntfs \
-    gdbserver \
     htop \
     lib7z \
     libsepol \
-    micro_bench \
-    mke2fs \
-    mkfs.ntfs \
-    mount.ntfs \
-    oprofiled \
     pigz \
     powertop \
-    sqlite3 \
-    strace \
-    tune2fs \
     unrar \
     unzip \
     wget \
@@ -206,10 +199,14 @@ PRODUCT_PACKAGES += \
     libhealthd.mokee
 endif
 
-# exFAT tools
+# Filesystems tools
 PRODUCT_PACKAGES += \
     fsck.exfat \
-    mkfs.exfat
+    fsck.ntfs \
+    mke2fs \
+    mkfs.exfat \
+    mkfs.ntfs \
+    mount.ntfs
 
 # Openssh
 PRODUCT_PACKAGES += \
@@ -225,16 +222,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     rsync
 
-# Stagefright FFMPEG plugin
-PRODUCT_PACKAGES += \
-    libffmpeg_extractor \
-    libffmpeg_omx \
-    media_codecs_ffmpeg.xml
-
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-    media.sf.omx-plugin=libffmpeg_omx.so \
-    media.sf.extractor-plugin=libffmpeg_extractor.so
-
 # Storage manager
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.storage_manager.enabled=true
@@ -244,12 +231,14 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     media.recorder.show_manufacturer_and_model=true
 
 # These packages are excluded from user builds
-ifneq ($(TARGET_BUILD_VARIANT),user)
-PRODUCT_PACKAGES += \
+PRODUCT_PACKAGES_DEBUG += \
+    micro_bench \
     procmem \
-    procrank
+    procrank \
+    strace
 
 # Conditionally build in su
+ifneq ($(TARGET_BUILD_VARIANT),user)
 ifeq ($(WITH_SU),true)
 PRODUCT_PACKAGES += \
     su
@@ -294,12 +283,6 @@ else
     MK_VERSION := MK$(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR)-$(MK_BUILD)-$(shell date +%Y%m%d%H%M)-$(MK_BUILDTYPE)
 endif
 
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-  ro.mk.support=bbs.mfunz.com \
-  ro.mk.version=$(MK_VERSION) \
-  ro.mk.releasetype=$(MK_BUILDTYPE) \
-  ro.modversion=$(MK_VERSION)
-
 ifeq ($(OTA_PACKAGE_SIGNING_KEY),)
     PRODUCT_EXTRA_RECOVERY_KEYS += \
         vendor/mk/build/target/product/security/mokee
@@ -311,5 +294,3 @@ endif
 -include $(WORKSPACE)/build_env/image-auto-bits.mk
 -include vendor/mk/config/partner_gms.mk
 -include vendor/mk/config/mk_extra.mk
-
-$(call prepend-product-if-exists, vendor/extra/product.mk)

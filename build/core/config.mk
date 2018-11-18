@@ -1,6 +1,6 @@
 # Copyright (C) 2015-2017 The MoKee Open Source Project
 # Copyright (C) 2015 The CyanogenMod Project
-#           (C) 2017 The LineageOS Project
+#           (C) 2017-2018 The LineageOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,9 +21,10 @@ FRAMEWORK_MOKEE_PLATFORM_API_FILE := $(TOPDIR)mokee-sdk/api/mk_current.txt
 FRAMEWORK_MOKEE_PLATFORM_REMOVED_API_FILE := $(TOPDIR)mokee-sdk/api/mk_removed.txt
 FRAMEWORK_MOKEE_API_NEEDS_UPDATE_TEXT := $(TOPDIR)vendor/mk/build/core/apicheck_msg_current.txt
 
-BUILD_MAVEN_PREBUILT := $(TOP)/vendor/mk/build/core/maven_artifact.mk
-PUBLISH_MAVEN_PREBUILT := $(TOP)/vendor/mk/build/core/maven_artifact_publish.mk
+BUILD_RRO_SYSTEM_PACKAGE := $(TOPDIR)vendor/mk/build/core/system_rro.mk
 
-BUILD_HTTP_PREBUILT := $(TOP)/vendor/mk/build/core/http_prebuilt.mk
+# Rules for MTK targets
+include $(TOPDIR)vendor/mk/build/core/mtk_target.mk
 
-BUILD_RRO_SYSTEM_PACKAGE := $(TOP)/vendor/mk/build/core/system_rro.mk
+# Rules for QCOM targets
+include $(TOPDIR)vendor/mk/build/core/qcom_target.mk

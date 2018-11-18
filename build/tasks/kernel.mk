@@ -65,7 +65,9 @@
 #   USE_CCACHE                         = Enable ccache (global Android flag)
 #
 #   NEED_KERNEL_MODULE_ROOT            = Optional, if true, install kernel
-#                                          modules in root instead of system
+#                                          modules in root instead of vendor
+#   NEED_KERNEL_MODULE_SYSTEM          = Optional, if true, install kernel
+#                                          modules in system instead of vendor
 
 ifneq ($(TARGET_NO_KERNEL),true)
 
@@ -74,6 +76,9 @@ TARGET_AUTO_KDIR := $(shell echo $(TARGET_DEVICE_DIR) | sed -e 's/^device/kernel
 ## Externally influenced variables
 # kernel location - optional, defaults to kernel/<vendor>/<device>
 TARGET_KERNEL_SOURCE ?= $(TARGET_AUTO_KDIR)
+ifneq ($(TARGET_PREBUILT_KERNEL),)
+TARGET_KERNEL_SOURCE :=
+endif
 KERNEL_SRC := $(TARGET_KERNEL_SOURCE)
 # kernel configuration - mandatory
 KERNEL_DEFCONFIG := $(TARGET_KERNEL_CONFIG)
@@ -196,6 +201,11 @@ KERNEL_MODULES_INSTALL := root
 KERNEL_MODULES_OUT := $(TARGET_ROOT_OUT)/lib/modules
 KERNEL_DEPMOD_STAGING_DIR := $(call intermediates-dir-for,PACKAGING,depmod_recovery)
 KERNEL_MODULE_MOUNTPOINT :=
+else ifeq ($(NEED_KERNEL_MODULE_SYSTEM),true)
+KERNEL_MODULES_INSTALL := $(TARGET_COPY_OUT_SYSTEM)
+KERNEL_MODULES_OUT := $(TARGET_OUT)/lib/modules
+KERNEL_DEPMOD_STAGING_DIR := $(call intermediates-dir-for,PACKAGING,depmod_system)
+KERNEL_MODULE_MOUNTPOINT := system
 else
 KERNEL_MODULES_INSTALL := $(TARGET_COPY_OUT_VENDOR)
 KERNEL_MODULES_OUT := $(TARGET_OUT_VENDOR)/lib/modules

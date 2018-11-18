@@ -1,4 +1,5 @@
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
-    ro.opa.eligible_device=true
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.opa.eligible_device=true \
+    ro.recents.grid=false
 
--include vendor/private/mk_private.mk
+-include vendor/mk-priv/config/mk_private.mk
