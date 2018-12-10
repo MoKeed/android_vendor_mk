@@ -110,8 +110,7 @@ PRODUCT_PACKAGES += \
     MKAudioService \
     MKParts \
     Development \
-    Profiles \
-    WeatherManagerService
+    Profiles 
 
 # Optional MK packages
 PRODUCT_PACKAGES += \
@@ -128,12 +127,9 @@ PRODUCT_PACKAGES += \
 # Custom MK packages
 PRODUCT_PACKAGES += \
     ExactCalculator \
-    LockClock \
     MKSettingsProvider \
     MoKeeSetupWizard \
-    MoKeeWeatherProvider \
     WallpaperPicker \
-    WeatherProvider
 
 # Exchange support
 #PRODUCT_PACKAGES += \
