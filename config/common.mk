@@ -132,7 +132,6 @@ PRODUCT_PACKAGES += \
     MKSettingsProvider \
     MoKeeSetupWizard \
     MoKeeWeatherProvider \
-    Venus \
     WallpaperPicker \
     WeatherProvider
 
